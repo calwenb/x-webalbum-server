@@ -7,9 +7,17 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 public interface BaseMapper {
-    <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper... whereWrapper);
+    <T> Integer selectCount(Class<T> targetClass, WhereWrapper whereWrapper);
 
-    <T> T selectTarget(Class<T> targetClass, WhereWrapper... whereWrapper);
+    <T> Integer selectCount(Class<T> targetClass);
+
+
+    <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper whereWrapper);
+
+    <T> ArrayList<T> selectTargets(Class<T> targetClass);
+
+    <T> T selectTarget(Class<T> targetClass, WhereWrapper wrapper);
+    <T> T selectTarget(Class<T> targetClass);
 
     <T> int insertTarget(T target);
 

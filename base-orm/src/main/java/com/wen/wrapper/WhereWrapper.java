@@ -1,26 +1,30 @@
 package com.wen.wrapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.wen.enums.OperatEnum;
 
 import java.util.*;
 
 public class WhereWrapper extends AbstractWrapper implements Wrapper {
-    private static HashSet<String> set;
+    private static HashSet<String> needWhereSet;
+    private String selectSQL;
+
+    public String getSelectSQL() {
+        return selectSQL;
+    }
 
     static {
-        set = new HashSet<>();
-        set.add(OperatEnum.EQ.getOperat());
-        set.add(OperatEnum.EQS.getOperat());
-        set.add(OperatEnum.NOT_EQ.getOperat());
-        set.add(OperatEnum.GREATER.getOperat());
-        set.add(OperatEnum.LESS.getOperat());
-        set.add(OperatEnum.G_EQ.getOperat());
-        set.add(OperatEnum.L_EQ.getOperat());
-        set.add(OperatEnum.LIKE.getOperat());
-        set.add(OperatEnum.LIKE_LEFT.getOperat());
-        set.add(OperatEnum.LIKE_RIGHT.getOperat());
+        needWhereSet = new HashSet<>();
+        needWhereSet.add(OperatEnum.EQ.getOperat());
+        needWhereSet.add(OperatEnum.EQS.getOperat());
+        needWhereSet.add(OperatEnum.NOT_EQ.getOperat());
+        needWhereSet.add(OperatEnum.GREATER.getOperat());
+        needWhereSet.add(OperatEnum.LESS.getOperat());
+        needWhereSet.add(OperatEnum.G_EQ.getOperat());
+        needWhereSet.add(OperatEnum.L_EQ.getOperat());
+        needWhereSet.add(OperatEnum.LIKE.getOperat());
+        needWhereSet.add(OperatEnum.LIKE_LEFT.getOperat());
+        needWhereSet.add(OperatEnum.LIKE_RIGHT.getOperat());
+        needWhereSet.add(OperatEnum.IN.getOperat());
 
     }
 
@@ -39,7 +43,7 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
             String field = node.getField();
             Object value = node.getValue();
 
-            if (set.contains(operating)) {
+            if (needWhereSet.contains(operating)) {
                 int len = whereSQL.length();
                 if (len == 0) {
                     whereSQL.append(" WHERE ");
@@ -51,7 +55,11 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
 
             }
             switch (operating) {
+             /*   case "SELECT":
 
+                    break;
+                case "SELECT_COUNT":
+                    break;*/
                 case "EQ":
                     whereSQL.append(" `").append(field).append("` ").append(" = ? ");
                     setList.add(value);
@@ -59,9 +67,20 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
               /*  case "EQS":
                     whereSQL.append(" `").append(field).append("` ").append("<> ? ");
                     break;
-/*                case "IN":
-                    whereSQL.append(" `").append(field).append("` ").append("IN ()");
-                    break;*/
+
+               */
+                case "IN":
+                    whereSQL.append(" `").append(field).append("` ").append(" IN ( ");
+                    Object[] inValues = (Object[]) value;
+                    for (int j = 0; j < inValues.length; j++) {
+                        if (j != 0) {
+                            whereSQL.append(" , ");
+                        }
+                        whereSQL.append(" ? ");
+                        setList.add(inValues[j]);
+                    }
+                    whereSQL.append(" ) ");
+                    break;
                 case "NOT_EQ":
                     whereSQL.append(" `").append(field).append("` ").append(" <> ? ");
                     setList.add(value);
@@ -109,7 +128,6 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
                     break;
                 case "LIMIT":
                     whereSQL.append(" LIMIT ").append(field);
-//                    setList.add(value);
                     break;
                 default:
                     whereSQL.append(operating).append(" `").append(field).append("` ").append("= ? ");
@@ -139,6 +157,12 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
         return this;
     }
 
+    public WhereWrapper in(String field, Object... inValues) {
+        Node node = new Node(OperatEnum.IN.getOperat(), field, inValues);
+        super.getWhereList().add(node);
+        return this;
+    }
+
     public WhereWrapper notEq(String field, Object value) {
         Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
         super.getWhereList().add(node);
@@ -164,7 +188,7 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
     }
 
     public WhereWrapper lEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
+        Node node = new Node(OperatEnum.L_EQ.getOperat(), field, value);
         super.getWhereList().add(node);
         return this;
     }
@@ -212,28 +236,15 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
         return this;
     }
 
-
-    
-/*    public WhereWrapper notEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
-        super.getWhereList().add(node);
-        return this;
-    }
-    public WhereWrapper notEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
-        super.getWhereList().add(node);
-        return this;
-    }
-    public WhereWrapper notEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
-        super.getWhereList().add(node);
-        return this;
-    }
-    public WhereWrapper notEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
-        super.getWhereList().add(node);
+/*    public WhereWrapper selectCount() {
+        this.selectSQL = "COUNT(*)";
         return this;
     }*/
+
+    public WhereWrapper select(String selectSQL) {
+        this.selectSQL = selectSQL;
+        return this;
+    }
 
 
 }

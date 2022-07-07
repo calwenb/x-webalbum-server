@@ -1,8 +1,10 @@
 package com.wen.mapper.impl;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mysql.cj.util.StringUtils;
 import com.wen.annotation.FieldName;
 import com.wen.annotation.TableName;
+import com.wen.enums.SelectTypeEnum;
 import com.wen.mapper.BaseMapper;
 import com.wen.util.CastUtil;
 import com.wen.util.FieldUtil;
@@ -31,10 +33,8 @@ public class BaseMapperImpl implements BaseMapper {
     DataSource dataSource;
     Connection conn;
 
-    /**
-     * <T> 规定泛型化
-     */
-    public <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper... whereWrapper) {
+
+    private <T> Object baseSelect(Class<T> targetClass, WhereWrapper wrapper, String type) {
 
         try {
             conn = dataSource.getConnection();
@@ -47,14 +47,30 @@ public class BaseMapperImpl implements BaseMapper {
 
             //sql拼接
             StringBuffer sql = new StringBuffer();
-            sql.append("SELECT * FROM ");
-            sql.append(tableName).append(" ");
+
+            sql.append("SELECT ");
+
+
+            if (Objects.equals(type, SelectTypeEnum.COUNT.getSelectType())) {
+                sql.append(" COUNT(*) ");
+            } else {
+                if (wrapper != null) {
+                    String selectSQL = wrapper.getSelectSQL();
+                    if (!StringUtils.isNullOrEmpty(selectSQL)) {
+                        sql.append(selectSQL);
+                    } else {
+                        sql.append(" * ");
+                    }
+                }
+            }
+
+            sql.append(" FROM ").append(tableName).append(" ");
 
             List<Object> setFields = null;
             //有Wrapper时
-            if (whereWrapper.length != 0) {
+            if (wrapper != null) {
                 //条件查询
-                HashMap<String, Object> wrapperResult = whereWrapper[0].getResult();
+                HashMap<String, Object> wrapperResult = wrapper.getResult();
                 String whereSQL = String.valueOf(wrapperResult.get("sql"));
                 setFields = CastUtil.castList(wrapperResult.get("setSQL"), Object.class);
                 if (!"".equals(whereSQL)) {
@@ -71,6 +87,7 @@ public class BaseMapperImpl implements BaseMapper {
             System.out.println(pst);
             ResultSet rs = pst.executeQuery();
 
+
             //获取全部属性的类
             Class<?>[] classes = new Class[fields.length];
             for (int i = 0; i < fields.length; i++) {
@@ -82,6 +99,15 @@ public class BaseMapperImpl implements BaseMapper {
 
             //返回数据解析实体
             while (rs.next()) {
+
+                if (Objects.equals(type, SelectTypeEnum.COUNT.getSelectType())) {
+                    return rs.getInt(1);
+                }
+
+/*                if (wrapper != null) {
+                    if (!StringUtils.isNullOrEmpty(wrapper.getSelectSQL())) {
+                    }
+                }*/
                 Object[] fieldsVal = new Object[fields.length];
                 for (int i = 0; i < fields.length; i++) {
                     fields[i].setAccessible(true);
@@ -101,6 +127,9 @@ public class BaseMapperImpl implements BaseMapper {
 
                 }
                 T target = ClassCon.newInstance(fieldsVal);
+                if (type == SelectTypeEnum.ONE.getSelectType()) {
+                    return target;
+                }
                 targets.add(target);
             }
             return targets;
@@ -121,8 +150,43 @@ public class BaseMapperImpl implements BaseMapper {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public <T> Integer selectCount(Class<T> targetClass, WhereWrapper wrapper) {
+        return (Integer) baseSelect(targetClass, wrapper, SelectTypeEnum.COUNT.getSelectType());
+    }
+
+    @Override
+    public <T> Integer selectCount(Class<T> targetClass) {
+        return (Integer) baseSelect(targetClass, null, SelectTypeEnum.COUNT.getSelectType());
+    }
+
+    /**
+     * <T> 规定泛型化
+     */
+    @Override
+    public <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper wrapper) {
+        baseSelect(targetClass, wrapper, SelectTypeEnum.ALL.getSelectType());
+        return (ArrayList<T>) baseSelect(targetClass, wrapper, SelectTypeEnum.ALL.getSelectType());
 
     }
+
+    @Override
+    public <T> ArrayList<T> selectTargets(Class<T> targetClass) {
+        return (ArrayList<T>) baseSelect(targetClass, null, SelectTypeEnum.ALL.getSelectType());
+    }
+
+
+    public <T> T selectTarget(Class<T> targetClass, WhereWrapper wrapper) {
+        return (T) baseSelect(targetClass, wrapper, SelectTypeEnum.ONE.getSelectType());
+    }
+
+    @Override
+    public <T> T selectTarget(Class<T> targetClass) {
+        return (T) baseSelect(targetClass, null, SelectTypeEnum.ONE.getSelectType());
+    }
+
 
     /**
      * 自定义 sql语句
@@ -205,95 +269,6 @@ public class BaseMapperImpl implements BaseMapper {
 
     }
 
-    public <T> T selectTarget(Class<T> targetClass, WhereWrapper... whereWrapper) {
-        try {
-            conn = dataSource.getConnection();
-            //返回目标
-            T target = null;
-            //反射获取目标信息
-            Field[] fields = targetClass.getDeclaredFields();
-            //确定表名
-            String tableName = defineTableName(targetClass);
-
-            //sql拼接
-            StringBuffer sql = new StringBuffer();
-            sql.append("SELECT * FROM ").append(tableName);
-
-            List<Object> setFields = null;
-            //有Wrapper时
-            if (whereWrapper.length != 0) {
-                //条件查询，解析where sql
-                HashMap<String, Object> wrapperResult = whereWrapper[0].getResult();
-                String whereSQL = String.valueOf(wrapperResult.get("sql"));
-                setFields = CastUtil.castList(wrapperResult.get("setSQL"), Object.class);
-                if (!whereSQL.equals("")) {
-                    sql.append(whereSQL);
-                }
-            }
-            //执行查询
-            PreparedStatement pst = conn.prepareStatement(String.valueOf(sql));
-
-            //需要设值时
-            for (int i = 0; setFields != null && i < setFields.size(); i++) {
-                pst.setObject(i + 1, setFields.get(i));
-            }
-            System.out.println(pst);
-            ResultSet rs = pst.executeQuery();
-
-            //获取全部属性的类
-            Class<?>[] classes = new Class[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                fields[i].setAccessible(true);
-                classes[i] = fields[i].getType();
-            }
-            //获取类构造器
-            Constructor<T> ClassCon = targetClass.getDeclaredConstructor(classes);
-
-            //返回数据解析实体
-            while (rs.next()) {
-                Object[] fieldsVal = new Object[fields.length];
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    //尝试获取属性上注解
-                    FieldName fieldName = fields[i].getDeclaredAnnotation(FieldName.class);
-                    if (fieldName != null) {
-                        fieldsVal[i] = rs.getObject(String.valueOf(fieldName.value()));
-                    } else {
-                        //默认蛇形
-                        fieldsVal[i] = rs.getObject(FieldUtil.fieldJavaToSql(fields[i].getName()));
-
-                    }
-                    //LocalDateTime转Date
-                    if (fieldsVal[i] != null && fieldsVal[i].getClass().equals(LocalDateTime.class)) {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.registerModule(new JavaTimeModule());
-                        fieldsVal[i] = Date.from(objectMapper.convertValue(fieldsVal[i], LocalDateTime.class).atZone(ZoneId.systemDefault()).toInstant());
-                    }
-
-                }
-
-                target = ClassCon.newInstance(fieldsVal);
-                break;
-            }
-            return target;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     public <T> int insertTarget(T target) {
         try {

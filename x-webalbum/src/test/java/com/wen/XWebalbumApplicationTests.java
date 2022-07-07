@@ -66,10 +66,10 @@ class XWebalbumApplicationTests {
 
     @Test
     void t6() {
-        for (int i = 0; i < 30; i++) {
+/*        for (int i = 0; i < 30; i++) {
             User user = new User(-1, "wen " + i, "wen " + i, "123", 2, "666", "@qq", "/#", new Date());
             baseMapper.insertTarget(user);
-        }
+        }*/
     }
 
     @Test
@@ -80,5 +80,43 @@ class XWebalbumApplicationTests {
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         users.forEach(System.out::println);
     }
+
+    @Test
+    void t10() {
+        WhereWrapper wrapper = new WhereWrapper();
+        wrapper.in("user_name", "admin", "wen 1").in("user_type", 2, 3);
+        ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
+        users.forEach(System.out::println);
+    }
+
+    @Test
+    void t11() {
+        WhereWrapper wrapper = new WhereWrapper();
+        wrapper.less("user_type", 1);
+        ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
+        users.forEach(System.out::println);
+    }
+
+    @Test
+    void t12() {
+        WhereWrapper wrapper = new WhereWrapper();
+        ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
+        users.forEach(System.out::println);
+    }
+
+    @Test
+    void t13() {
+        WhereWrapper wrapper = new WhereWrapper();
+        User user = baseMapper.selectTarget(User.class, wrapper);
+        System.out.println(user);
+    }
+
+    @Test
+    void t14() {
+        WhereWrapper wrapper = new WhereWrapper();
+        Integer integer = baseMapper.selectCount(User.class);
+        System.out.println(integer);
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package com.wen.wrapper;
+package com.wen.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,7 +48,11 @@ public enum OperatEnum {
 
     LIKE("LIKE"),
     LIKE_LEFT("LIKE_LEFT"),
-    LIKE_RIGHT("LIKE_RIGHT");
+    LIKE_RIGHT("LIKE_RIGHT"),
+
+/*    SELECT("SELECT"),
+
+    SELECT_COUNT("SELECT_COUNT")*/;
 
     private final String operat;
 }

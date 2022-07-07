@@ -1,13 +1,12 @@
 package com.wen.wrapper;
 
+import com.wen.enums.OperatEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public abstract class AbstractWrapper {
 
