@@ -4,8 +4,16 @@ import com.wen.enums.OperatEnum;
 
 import java.util.*;
 
+/**
+ * WhereWrapper类
+ * 构建查询sql
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
+
 public class WhereWrapper extends AbstractWrapper implements Wrapper {
-    private static HashSet<String> needWhereSet;
+    private static HashSet<OperatEnum> needWhereSet;
     private String selectSQL;
 
     public String getSelectSQL() {
@@ -14,17 +22,17 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
 
     static {
         needWhereSet = new HashSet<>();
-        needWhereSet.add(OperatEnum.EQ.getOperat());
-        needWhereSet.add(OperatEnum.EQS.getOperat());
-        needWhereSet.add(OperatEnum.NOT_EQ.getOperat());
-        needWhereSet.add(OperatEnum.GREATER.getOperat());
-        needWhereSet.add(OperatEnum.LESS.getOperat());
-        needWhereSet.add(OperatEnum.G_EQ.getOperat());
-        needWhereSet.add(OperatEnum.L_EQ.getOperat());
-        needWhereSet.add(OperatEnum.LIKE.getOperat());
-        needWhereSet.add(OperatEnum.LIKE_LEFT.getOperat());
-        needWhereSet.add(OperatEnum.LIKE_RIGHT.getOperat());
-        needWhereSet.add(OperatEnum.IN.getOperat());
+        needWhereSet.add(OperatEnum.EQ);
+        needWhereSet.add(OperatEnum.EQS);
+        needWhereSet.add(OperatEnum.NOT_EQ);
+        needWhereSet.add(OperatEnum.GREATER);
+        needWhereSet.add(OperatEnum.LESS);
+        needWhereSet.add(OperatEnum.G_EQ);
+        needWhereSet.add(OperatEnum.L_EQ);
+        needWhereSet.add(OperatEnum.LIKE);
+        needWhereSet.add(OperatEnum.LIKE_LEFT);
+        needWhereSet.add(OperatEnum.LIKE_RIGHT);
+        needWhereSet.add(OperatEnum.IN);
 
     }
 
@@ -37,9 +45,9 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
         ArrayList<Object> setList = new ArrayList<>();
         StringBuffer whereSQL = new StringBuffer();
 
-        for (int i = 0; i < whereList.size(); i++) {
-            Node node = whereList.get(i);
-            String operating = node.getOperating();
+        for (Node node : whereList) {
+            OperatEnum operating = node.getOperating();
+            System.out.println("operating " + operating);
             String field = node.getField();
             Object value = node.getValue();
 
@@ -48,28 +56,22 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
                 if (len == 0) {
                     whereSQL.append(" WHERE ");
                 } else {
-                    if (!OperatEnum.OR.getOperat().equals(whereSQL.substring(len - 3, len - 1))) {
+                    if (!"OR".equals(whereSQL.substring(len - 3, len - 1))) {
                         whereSQL.append(" AND ");
                     }
                 }
 
             }
             switch (operating) {
-             /*   case "SELECT":
-
-                    break;
-                case "SELECT_COUNT":
-                    break;*/
-                case "EQ":
+                case EQ:
                     whereSQL.append(" `").append(field).append("` ").append(" = ? ");
                     setList.add(value);
                     break;
               /*  case "EQS":
                     whereSQL.append(" `").append(field).append("` ").append("<> ? ");
                     break;
-
                */
-                case "IN":
+                case IN:
                     whereSQL.append(" `").append(field).append("` ").append(" IN ( ");
                     Object[] inValues = (Object[]) value;
                     for (int j = 0; j < inValues.length; j++) {
@@ -81,52 +83,52 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
                     }
                     whereSQL.append(" ) ");
                     break;
-                case "NOT_EQ":
+                case NOT_EQ:
                     whereSQL.append(" `").append(field).append("` ").append(" <> ? ");
                     setList.add(value);
                     break;
-                case "GREATER":
+                case GREATER:
                     whereSQL.append(" `").append(field).append("` ").append(" > ? ");
                     setList.add(value);
                     break;
-                case "LESS":
+                case LESS:
                     whereSQL.append(" `").append(field).append("` ").append(" < ? ");
                     setList.add(value);
                     break;
-                case "G_EQ":
+                case G_EQ:
                     whereSQL.append(" `").append(field).append("` ").append(" >=? ");
                     setList.add(value);
                     break;
-                case "L_EQ":
+                case L_EQ:
                     whereSQL.append(" `").append(field).append("` ").append(" <= ? ");
                     setList.add(value);
                     break;
 
-                case "OR":
+                case OR:
                     whereSQL.append(" OR ");
                     break;
-                case "HEAD":
+                case HEAD:
                     whereSQL.append(" WHERE ").append(" `").append(field).append("` ").append(" = ? ");
                     setList.add(value);
                     break;
-                case "LIKE":
+                case LIKE:
                     whereSQL.append(" CONCAT( ").append(field).append(" ) ").append(" LIKE '%").append(value).append("%' ");
                     break;
-                case "LIKE_LEFT":
+                case LIKE_LEFT:
 
                     whereSQL.append(" CONCAT( ").append(field).append(" ) ").append(" LIKE '").append(value).append("%' ");
                     break;
-                case "LIKE_RIGHT":
+                case LIKE_RIGHT:
 
                     whereSQL.append(" CONCAT( ").append(field).append(" ) ").append(" LIKE '%").append(value).append("' ");
                     break;
-                case "ORDER":
+                case ORDER:
                     whereSQL.append(" ORDER BY ").append(field);
                     break;
-                case "ORDER_DESC":
+                case ORDER_DESC:
                     whereSQL.append(" ORDER BY ").append(field).append(" DESC ");
                     break;
-                case "LIMIT":
+                case LIMIT:
                     whereSQL.append(" LIMIT ").append(field);
                     break;
                 default:
@@ -134,9 +136,6 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
                     setList.add(value);
 
             }
-           /* if (value != null) {
-                setList.add(value);
-            }*/
 
         }
         map.put("sql", whereSQL);
@@ -146,100 +145,96 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
 
 
     public WhereWrapper or() {
-        Node node = new Node(OperatEnum.OR.getOperat(), null, null);
+        Node node = new Node(OperatEnum.OR, null, null);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper eq(String field, Object value) {
-        Node node = new Node(OperatEnum.EQ.getOperat(), field, value);
+        Node node = new Node(OperatEnum.EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper in(String field, Object... inValues) {
-        Node node = new Node(OperatEnum.IN.getOperat(), field, inValues);
+        Node node = new Node(OperatEnum.IN, field, inValues);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper notEq(String field, Object value) {
-        Node node = new Node(OperatEnum.NOT_EQ.getOperat(), field, value);
+        Node node = new Node(OperatEnum.NOT_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper greater(String field, Object value) {
-        Node node = new Node(OperatEnum.GREATER.getOperat(), field, value);
+        Node node = new Node(OperatEnum.GREATER, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper less(String field, Object value) {
-        Node node = new Node(OperatEnum.LESS.getOperat(), field, value);
+        Node node = new Node(OperatEnum.LESS, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper gEq(String field, Object value) {
-        Node node = new Node(OperatEnum.G_EQ.getOperat(), field, value);
+        Node node = new Node(OperatEnum.G_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper lEq(String field, Object value) {
-        Node node = new Node(OperatEnum.L_EQ.getOperat(), field, value);
+        Node node = new Node(OperatEnum.L_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
 
     public WhereWrapper like(String fields, Object value) {
-        Node node = new Node(OperatEnum.LIKE.getOperat(), fields, value);
+        Node node = new Node(OperatEnum.LIKE, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper likeLeft(String fields, Object value) {
-        Node node = new Node(OperatEnum.LIKE_LEFT.getOperat(), fields, value);
+        Node node = new Node(OperatEnum.LIKE_LEFT, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper likeRight(String fields, Object value) {
-        Node node = new Node(OperatEnum.LIKE_RIGHT.getOperat(), fields, value);
+        Node node = new Node(OperatEnum.LIKE_RIGHT, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper limit(int offset, int rows) {
-        Node node = new Node(OperatEnum.LIMIT.getOperat(), offset + "," + rows, null);
+        Node node = new Node(OperatEnum.LIMIT, offset + "," + rows, null);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper limit(int rows) {
-        Node node = new Node(OperatEnum.LIMIT.getOperat(), String.valueOf(rows), null);
+        Node node = new Node(OperatEnum.LIMIT, String.valueOf(rows), null);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper orderDesc(String fields) {
-        Node node = new Node(OperatEnum.ORDER_DESC.getOperat(), fields, null);
+        Node node = new Node(OperatEnum.ORDER_DESC, fields, null);
         super.getWhereList().add(node);
         return this;
     }
 
     public WhereWrapper order(String fields) {
-        Node node = new Node(OperatEnum.ORDER.getOperat(), fields, null);
+        Node node = new Node(OperatEnum.ORDER, fields, null);
         super.getWhereList().add(node);
         return this;
     }
 
-/*    public WhereWrapper selectCount() {
-        this.selectSQL = "COUNT(*)";
-        return this;
-    }*/
 
     public WhereWrapper select(String selectSQL) {
         this.selectSQL = selectSQL;

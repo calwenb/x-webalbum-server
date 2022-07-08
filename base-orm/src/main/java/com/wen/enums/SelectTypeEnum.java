@@ -3,11 +3,15 @@ package com.wen.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
+/**
+ * select的查询类型枚举类
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
+
 public enum SelectTypeEnum {
-    ALL("ALL"),
-    ONE("ONE"),
-    COUNT("COUNT");
-    private String selectType;
+    ALL,
+    ONE,
+    COUNT
 }

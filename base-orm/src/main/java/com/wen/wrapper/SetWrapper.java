@@ -1,8 +1,18 @@
 package com.wen.wrapper;
 
+import com.wen.enums.OperatEnum;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
+/**
+ * SetWrapper类
+ * 构建更新sql
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 
 public class SetWrapper extends AbstractWrapper implements Wrapper {
 
@@ -14,11 +24,11 @@ public class SetWrapper extends AbstractWrapper implements Wrapper {
         ArrayList<Object> setList = new ArrayList<>();
         StringBuffer whereSQL = new StringBuffer();
         for (Node node : whereList) {
-            String operating = node.getOperating();
+            OperatEnum operating = node.getOperating();
             String field = node.getField();
             Object value = node.getValue();
             switch (operating) {
-                case "HEAD":
+                case HEAD:
                     whereSQL.append(" SET ")
                             .append(" `").append(field).append("` ").append("= ? ");
                     break;

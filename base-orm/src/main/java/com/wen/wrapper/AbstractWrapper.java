@@ -8,15 +8,28 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class AbstractWrapper {
+/**
+ * 抽象wrapper类
+ * 1.
+ * Node数据结构：
+ * { operating：包装操作指令，field：字段，value：预编译值 }
+ * 2.
+ * whereList：保存各个Node，以便解析
+ * 3.
+ * getResult()抽象方法：将whereList解析成sql
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 
+public abstract class AbstractWrapper {
 
     //WhereNode的内部类
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Node {
-        private String operating;
+        private OperatEnum operating;
         private String field;
         private Object value;
     }
@@ -29,26 +42,26 @@ public abstract class AbstractWrapper {
 
 
     public AbstractWrapper add(String field, Object value) {
-        Node node = new Node(OperatEnum.HEAD.getOperat(), field, value);
+        Node node = new Node(OperatEnum.HEAD, field, value);
         whereList.add(node);
         return this;
     }
 
 
     public AbstractWrapper and(String field, Object value) {
-        Node node = new Node(OperatEnum.AND.getOperat(), field, value);
+        Node node = new Node(OperatEnum.AND, field, value);
         whereList.add(node);
         return this;
     }
 
 /*    public AbstractWrapper or(String field, Object value) {
-        Node node = new Node(OperatEnum.OR.getOperat(), field, value);
+        Node node = new Node(OperatEnum.OR, field, value);
         whereList.add(node);
         return this;
     }
 
     public AbstractWrapper or() {
-        Node node = new Node(OperatEnum.OR.getOperat(),null,null);
+        Node node = new Node(OperatEnum.OR,null,null);
         whereList.add(node);
         return this;
     }*/

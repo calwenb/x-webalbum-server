@@ -27,15 +27,22 @@ import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+/**
+ * BaseMapper实现类
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 @Component
 public class BaseMapperImpl implements BaseMapper {
+
     @Resource
     DataSource dataSource;
     Connection conn;
 
 
-    private <T> Object baseSelect(Class<T> targetClass, WhereWrapper wrapper, String type) {
-
+    private <T> Object baseSelect(Class<T> targetClass, WhereWrapper wrapper, SelectTypeEnum type) {
         try {
             conn = dataSource.getConnection();
             ArrayList<T> targets = new ArrayList<>();
@@ -50,8 +57,7 @@ public class BaseMapperImpl implements BaseMapper {
 
             sql.append("SELECT ");
 
-
-            if (Objects.equals(type, SelectTypeEnum.COUNT.getSelectType())) {
+            if (Objects.equals(type, SelectTypeEnum.COUNT)) {
                 sql.append(" COUNT(*) ");
             } else {
                 if (wrapper != null) {
@@ -87,7 +93,6 @@ public class BaseMapperImpl implements BaseMapper {
             System.out.println(pst);
             ResultSet rs = pst.executeQuery();
 
-
             //获取全部属性的类
             Class<?>[] classes = new Class[fields.length];
             for (int i = 0; i < fields.length; i++) {
@@ -100,7 +105,7 @@ public class BaseMapperImpl implements BaseMapper {
             //返回数据解析实体
             while (rs.next()) {
 
-                if (Objects.equals(type, SelectTypeEnum.COUNT.getSelectType())) {
+                if (Objects.equals(type, SelectTypeEnum.COUNT)) {
                     return rs.getInt(1);
                 }
 
@@ -127,7 +132,7 @@ public class BaseMapperImpl implements BaseMapper {
 
                 }
                 T target = ClassCon.newInstance(fieldsVal);
-                if (type == SelectTypeEnum.ONE.getSelectType()) {
+                if (type == SelectTypeEnum.ONE) {
                     return target;
                 }
                 targets.add(target);
@@ -154,12 +159,12 @@ public class BaseMapperImpl implements BaseMapper {
 
     @Override
     public <T> Integer selectCount(Class<T> targetClass, WhereWrapper wrapper) {
-        return (Integer) baseSelect(targetClass, wrapper, SelectTypeEnum.COUNT.getSelectType());
+        return (Integer) baseSelect(targetClass, wrapper, SelectTypeEnum.COUNT);
     }
 
     @Override
     public <T> Integer selectCount(Class<T> targetClass) {
-        return (Integer) baseSelect(targetClass, null, SelectTypeEnum.COUNT.getSelectType());
+        return (Integer) baseSelect(targetClass, null, SelectTypeEnum.COUNT);
     }
 
     /**
@@ -167,24 +172,23 @@ public class BaseMapperImpl implements BaseMapper {
      */
     @Override
     public <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper wrapper) {
-        baseSelect(targetClass, wrapper, SelectTypeEnum.ALL.getSelectType());
-        return (ArrayList<T>) baseSelect(targetClass, wrapper, SelectTypeEnum.ALL.getSelectType());
+        return (ArrayList<T>) baseSelect(targetClass, wrapper, SelectTypeEnum.ALL);
 
     }
 
     @Override
     public <T> ArrayList<T> selectTargets(Class<T> targetClass) {
-        return (ArrayList<T>) baseSelect(targetClass, null, SelectTypeEnum.ALL.getSelectType());
+        return (ArrayList<T>) baseSelect(targetClass, null, SelectTypeEnum.ALL);
     }
 
 
     public <T> T selectTarget(Class<T> targetClass, WhereWrapper wrapper) {
-        return (T) baseSelect(targetClass, wrapper, SelectTypeEnum.ONE.getSelectType());
+        return (T) baseSelect(targetClass, wrapper, SelectTypeEnum.ONE);
     }
 
     @Override
     public <T> T selectTarget(Class<T> targetClass) {
-        return (T) baseSelect(targetClass, null, SelectTypeEnum.ONE.getSelectType());
+        return (T) baseSelect(targetClass, null, SelectTypeEnum.ONE);
     }
 
 

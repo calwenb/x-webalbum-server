@@ -4,55 +4,56 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @author Mr.wen
+ * wrapper操作枚举类
+ *
+ * @author calwen
+ * @date 2022/7/9
  */
 
-@Getter
-@AllArgsConstructor
 public enum OperatEnum {
     /**
      *
      */
-    HEAD("HEAD"),
+    HEAD,
     /**
      *
      */
-    AND("AND"),
+    AND,
     /**
      *
      */
-    OR("OR"),
+    OR,
 
     /**
      *
      */
-    ORDER("ORDER"),
+    ORDER,
     /**
      *
      */
-    ORDER_DESC("ORDER_DESC"),
+    ORDER_DESC,
     /**
      *
      */
-    LIMIT("LIMIT"),
+    LIMIT,
 
-    EQ("EQ"), EQS("EQS"), IN("IN"),
+    EQ, EQS, IN,
     /**
      *
      */
-    NOT_EQ("NOT_EQ"),
-    GREATER("GREATER"),
-    LESS("LESS"),
-    G_EQ("G_EQ"),
-    L_EQ("L_EQ"),
+    NOT_EQ,
+    GREATER,
+    LESS,
+    G_EQ,
+    L_EQ,
 
-    LIKE("LIKE"),
-    LIKE_LEFT("LIKE_LEFT"),
-    LIKE_RIGHT("LIKE_RIGHT"),
+    LIKE,
+    LIKE_LEFT,
+    LIKE_RIGHT,
 
 /*    SELECT("SELECT"),
 
     SELECT_COUNT("SELECT_COUNT")*/;
 
-    private final String operat;
+
 }

@@ -6,6 +6,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+/**
+ * 封装基本CRUD
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 public interface BaseMapper {
     <T> Integer selectCount(Class<T> targetClass, WhereWrapper whereWrapper);
 
@@ -17,6 +23,7 @@ public interface BaseMapper {
     <T> ArrayList<T> selectTargets(Class<T> targetClass);
 
     <T> T selectTarget(Class<T> targetClass, WhereWrapper wrapper);
+
     <T> T selectTarget(Class<T> targetClass);
 
     <T> int insertTarget(T target);
