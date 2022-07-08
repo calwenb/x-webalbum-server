@@ -1,8 +1,7 @@
-package com.wen.mapper;
+package com.wen.baseorm.mapper;
 
-import com.wen.wrapper.SetWrapper;
-import com.wen.wrapper.WhereWrapper;
-import org.springframework.stereotype.Component;
+import com.wen.baseorm.wrapper.SetWrapper;
+import com.wen.baseorm.wrapper.WhereWrapper;
 
 import java.util.ArrayList;
 

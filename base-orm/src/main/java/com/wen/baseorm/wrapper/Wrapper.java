@@ -1,4 +1,4 @@
-package com.wen.wrapper;
+package com.wen.baseorm.wrapper;
 
 /**
  * wrapper接口

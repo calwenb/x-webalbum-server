@@ -1,4 +1,11 @@
-package com.wen.util;
+package com.wen.baseorm.util;
+
+/**
+ * 字段工具类
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 
 public class FieldUtil {
     public static String fieldSqlToJava(String field) {

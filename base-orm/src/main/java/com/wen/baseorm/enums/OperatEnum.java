@@ -1,4 +1,4 @@
-package com.wen.enums;
+package com.wen.baseorm.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,11 +1,8 @@
 package com.wen.pojo;
 
-import com.wen.annotation.FieldName;
-import com.wen.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.util.Date;
 

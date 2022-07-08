@@ -1,15 +1,13 @@
 package com.wen;
 
-import com.wen.mapper.impl.BaseMapperImpl;
+import com.wen.baseorm.mapper.impl.BaseMapperImpl;
 import com.wen.pojo.User;
-import com.wen.wrapper.WhereWrapper;
-import com.wen.wrapper.Wrapper;
+import com.wen.baseorm.wrapper.WhereWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 
 @SpringBootTest
 class XWebalbumApplicationTests {

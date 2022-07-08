@@ -1,6 +1,6 @@
-package com.wen.wrapper;
+package com.wen.baseorm.wrapper;
 
-import com.wen.enums.OperatEnum;
+import com.wen.baseorm.enums.OperatEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

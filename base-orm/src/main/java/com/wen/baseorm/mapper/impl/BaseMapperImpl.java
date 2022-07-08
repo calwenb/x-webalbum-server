@@ -1,15 +1,15 @@
-package com.wen.mapper.impl;
+package com.wen.baseorm.mapper.impl;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mysql.cj.util.StringUtils;
-import com.wen.annotation.FieldName;
-import com.wen.annotation.TableName;
-import com.wen.enums.SelectTypeEnum;
-import com.wen.mapper.BaseMapper;
-import com.wen.util.CastUtil;
-import com.wen.util.FieldUtil;
-import com.wen.wrapper.SetWrapper;
-import com.wen.wrapper.WhereWrapper;
+import com.wen.baseorm.annotation.FieldName;
+import com.wen.baseorm.annotation.TableName;
+import com.wen.baseorm.util.CastUtil;
+import com.wen.baseorm.util.FieldUtil;
+import com.wen.baseorm.enums.SelectTypeEnum;
+import com.wen.baseorm.mapper.BaseMapper;
+import com.wen.baseorm.wrapper.SetWrapper;
+import com.wen.baseorm.wrapper.WhereWrapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

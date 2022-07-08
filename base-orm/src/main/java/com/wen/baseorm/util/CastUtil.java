@@ -1,7 +1,14 @@
-package com.wen.util;
+package com.wen.baseorm.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * 转换类型工具类
+ *
+ * @author calwen
+ * @date 2022/7/9
+ */
 
 public class CastUtil {
     public static <T> List<T> castList(Object obj, Class<T> clazz) {

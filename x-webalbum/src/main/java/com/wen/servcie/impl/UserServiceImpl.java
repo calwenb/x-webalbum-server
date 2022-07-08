@@ -1,13 +1,12 @@
 package com.wen.servcie.impl;
 
-import com.wen.mapper.BaseMapper;
+import com.wen.baseorm.mapper.BaseMapper;
 import com.wen.mapper.UserMapper;
-import com.wen.mapper.impl.BaseMapperImpl;
 import com.wen.pojo.User;
 import com.wen.servcie.*;
 import com.wen.utils.ConfigUtil;
 import com.wen.utils.FileUtil;
-import com.wen.wrapper.WhereWrapper;
+import com.wen.baseorm.wrapper.WhereWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
