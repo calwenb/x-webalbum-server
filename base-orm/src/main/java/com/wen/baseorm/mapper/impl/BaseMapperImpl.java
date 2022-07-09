@@ -35,6 +35,11 @@ public class BaseMapperImpl implements BaseMapper {
     @Resource
     DataSource dataSource;
     Connection conn;
+    /**
+     * PreparedStatement sql 日志
+     * AOP输出日志
+     */
+    private String pstLog;
 
 
     private <T> Object baseSelect(Class<T> targetClass, QueryWrapper wrapper, SelectTypeEnum type) {
@@ -85,7 +90,7 @@ public class BaseMapperImpl implements BaseMapper {
             for (int i = 0; setFields != null && i < setFields.size(); i++) {
                 pst.setObject(i + 1, setFields.get(i));
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             ResultSet rs = pst.executeQuery();
 
             //获得类构造器
@@ -187,11 +192,10 @@ public class BaseMapperImpl implements BaseMapper {
             for (int i = 0; setSqls != null && i < setSqls.length; i++) {
                 pst.setObject(i + 1, setSqls[i]);
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             ResultSet rs = pst.executeQuery();
 
             Constructor<T> classCon = MapperUtil.getConstructor(targetClass, fields);
-
             //返回数据解析实体
             while (rs.next()) {
                 T target = MapperUtil.parseTarget(rs, fields, classCon);
@@ -274,7 +278,7 @@ public class BaseMapperImpl implements BaseMapper {
                 }
                 pst.setObject(i, fields[i].get(target));
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             return pst.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -323,11 +327,9 @@ public class BaseMapperImpl implements BaseMapper {
                 }
                 pst.setObject(i + 1, fields[i].get(target));
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             return pst.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (SQLException | IllegalAccessException e) {
             throw new RuntimeException(e);
         } finally {
             try {
@@ -371,7 +373,7 @@ public class BaseMapperImpl implements BaseMapper {
             for (int i = 0; setFields != null && i < setFields.size(); i++) {
                 pst.setObject(i + 1, setFields.get(i));
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             return pst.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -426,7 +428,7 @@ public class BaseMapperImpl implements BaseMapper {
             for (int i = 0; i < setFields.size(); i++) {
                 pst.setObject(i + 1, setFields.get(i));
             }
-            System.out.println(pst);
+            pstLog = String.valueOf(pst);
             return pst.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
