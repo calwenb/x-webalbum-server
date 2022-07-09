@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.wen.mapper.UserMapper">
-    <resultMap id="UserMap" type="com.wen.pojo.User">
+<mapper namespace="com.wen.xwebalbum.mapper.UserMapper">
+    <resultMap id="UserMap" type="com.wen.xwebalbum.pojo.User">
         <result property="id" column="id"/>
         <result property="userName" column="user_name"/>
         <result property="loginName" column="login_name"/>
@@ -72,7 +72,7 @@
           and pass_word = #{pwd}
     </select>
 
-    <insert id="addUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.wen.pojo.User">
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.wen.xwebalbum.pojo.User">
         insert into x_webalbum.user(user_name, login_name, pass_word, user_type, phone_number, email, avatar,
                                     register_time)
         values (#{userName}, #{loginName}, #{passWord}, #{userType}, #{phoneNumber}, #{email}, #{avatar},
@@ -85,7 +85,7 @@
         from x_webalbum.user
         where id = #{id}
     </select>
-    <select id="getUserByLName" resultType="com.wen.pojo.User">
+    <select id="getUserByLName" resultType="com.wen.xwebalbum.pojo.User">
         select *
         from x_webalbum.user
         where login_name = #{loginName}

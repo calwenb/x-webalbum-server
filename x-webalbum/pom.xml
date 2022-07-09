@@ -23,8 +23,8 @@
 
         <dependency>
             <groupId>com.wen.baseorm</groupId>
-            <artifactId>base-orm</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <artifactId>baseorm-spring-boot-starter</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <!--编码-->
         <!-- https://mvnrepository.com/artifact/org.apache.directory.studio/org.apache.commons.codec -->

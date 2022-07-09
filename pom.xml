@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>x-webalbum</module>
-        <module>base-orm</module>
+        <module>baseorm-spring-boot-starter</module>
     </modules>
 
     <properties>

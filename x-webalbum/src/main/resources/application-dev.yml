@@ -56,7 +56,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
-  type-aliases-package: com.wen.pojo
+  type-aliases-package: com.wen.xwebalbum.pojo
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
@@ -86,3 +86,6 @@ x-webalbum:
     root-id: 0
     #单位 MB
     max-size: 2000
+
+base-orm:
+  logger: true

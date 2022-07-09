@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.wen.mapper.FileFolderMapper">
-    <resultMap id="FileFolderMap" type="com.wen.pojo.FileFolder">
+<mapper namespace="com.wen.xwebalbum.mapper.FileFolderMapper">
+    <resultMap id="FileFolderMap" type="com.wen.xwebalbum.pojo.FileFolder">
         <result property="fileFolderId" column="file_folder_id"/>
         <result property="fileFolderName" column="file_folder_name"/>
         <result property="parentFolderId" column="parent_folder_id"/>
@@ -12,26 +12,30 @@
         <result property="fileFolderPath" column="file_folder_path"/>
     </resultMap>
     <sql id="allField">
-        file_folder_id,file_folder_name,parent_folder_id,file_store_id,file_folder_path
+        file_folder_id
+        ,file_folder_name,parent_folder_id,file_store_id,file_folder_path
     </sql>
     <sql id="noAllField">
-        file_folder_name,parent_folder_id,file_store_id,file_folder_path
+        file_folder_name
+        ,parent_folder_id,file_store_id,file_folder_path
     </sql>
     <sql id="allProperty">
-        #{fileFolderId},
+        #{fileFolderId}
+        ,
         #{fileFolderName},
         #{parentFolderId},
         #{fileStoreId},
         #{fileFolderPath}
     </sql>
     <sql id="noAllProperty">
-        #{fileFolderName},
+        #{fileFolderName}
+        ,
         #{parentFolderId},
         #{fileStoreId},
         #{fileFolderPath}
     </sql>
 
-    <insert id="addFileFolder" parameterType="com.wen.pojo.FileFolder">
+    <insert id="addFileFolder" parameterType="com.wen.xwebalbum.pojo.FileFolder">
         insert into x_webalbum.file_folder(<include refid="noAllField"/>)
         values (<include refid="noAllProperty"/>);
     </insert>

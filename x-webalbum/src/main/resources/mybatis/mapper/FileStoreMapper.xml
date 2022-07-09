@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.wen.mapper.FileStoreMapper">
-    <resultMap id="FileStore" type="com.wen.pojo.FileStore">
+<mapper namespace="com.wen.xwebalbum.mapper.FileStoreMapper">
+    <resultMap id="FileStore" type="com.wen.xwebalbum.pojo.FileStore">
         <result property="fileStoreId" column="file_store_id"/>
         <result property="userId" column="user_id"/>
         <result property="currentSize" column="current_size"/>
@@ -12,10 +12,12 @@
     </resultMap>
 
     <sql id="allField">
-        user_id,current_size,max_size
+        user_id
+        ,current_size,max_size
     </sql>
 
-    <insert id="addFileStore" useGeneratedKeys="true" keyProperty="fileStoreId" parameterType="com.wen.pojo.FileStore">
+    <insert id="addFileStore" useGeneratedKeys="true" keyProperty="fileStoreId"
+            parameterType="com.wen.xwebalbum.pojo.FileStore">
         insert into x_webalbum.file_store (<include refid="allField"/>)
         values (#{userId},#{currentSize},#{maxSize})
 
@@ -24,8 +26,7 @@
     <select id="queryFileStoreByUserId" resultMap="FileStore">
         select *
         from x_webalbum.file_store
-        where user_id = #{userId}
-        limit 1;
+        where user_id = #{userId} limit 1;
     </select>
 
     <select id="queryFileStores" resultMap="FileStore">

@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.wen.mapper.MyFileMapper">
-    <resultMap id="MyFileMap" type="com.wen.pojo.MyFile">
+<mapper namespace="com.wen.xwebalbum.mapper.MyFileMapper">
+    <resultMap id="MyFileMap" type="com.wen.xwebalbum.pojo.MyFile">
         <result property="myFileId" column="my_file_id"/>
         <result property="myFileName" column="my_file_name"/>
         <result property="fileStoreId" column="file_store_id"/>
@@ -35,7 +35,7 @@
         #{type}
     </sql>
     <!--获取自增主键值,并赋值-->
-    <insert id="addFile" useGeneratedKeys="true" keyProperty="myFileId" parameterType="com.wen.pojo.MyFile">
+    <insert id="addFile" useGeneratedKeys="true" keyProperty="myFileId" parameterType="com.wen.xwebalbum.pojo.MyFile">
         insert into x_webalbum.my_file(<include refid="NoAllField"/>)
         values
         (<include refid="NoAllProperty"></include>);
