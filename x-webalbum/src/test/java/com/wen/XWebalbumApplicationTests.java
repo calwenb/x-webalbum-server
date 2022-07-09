@@ -113,8 +113,14 @@ class XWebalbumApplicationTests {
         QueryWrapper wrapper = new QueryWrapper()
                 .notEq("user_name", "admin")
                 .or()
-                .notEq("user_type",2);
+                .notEq("user_type", 2);
         Integer integer = baseMapper.selectCount(User.class, wrapper);
+        System.out.println(integer);
+    }
+
+    @Test
+    void t15() {
+        Integer integer = baseMapper.selectCount(User.class);
         System.out.println(integer);
     }
 

@@ -16,6 +16,4 @@ import java.lang.annotation.*;
 @Documented
 public @interface FieldName {
     String value();
-
-    IdTypeEnum idType() default IdTypeEnum.AUTO;
 }

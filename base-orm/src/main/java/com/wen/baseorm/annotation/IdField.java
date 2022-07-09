@@ -1,5 +1,7 @@
 package com.wen.baseorm.annotation;
 
+import com.wen.baseorm.enums.IdTypeEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -15,5 +17,7 @@ import java.lang.annotation.*;
 public @interface IdField {
 
     String value();
+
+    IdTypeEnum idType() default IdTypeEnum.AUTO;
 
 }
