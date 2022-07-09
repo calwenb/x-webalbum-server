@@ -2,7 +2,7 @@ package com.wen;
 
 import com.wen.baseorm.mapper.impl.BaseMapperImpl;
 import com.wen.pojo.User;
-import com.wen.baseorm.wrapper.WhereWrapper;
+import com.wen.baseorm.wrapper.QueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,15 +21,14 @@ class XWebalbumApplicationTests {
 
     @Test
     void t1() {
-        String sql = "select * from x_webalbum.user " +
-                "where concat(user_name) like ? ";
+        String sql = "select * from x_webalbum.user " + "where concat(user_name) like ? ";
         ArrayList<User> users = baseMapper.selectSQL(sql, new Object[]{"%n%"}, User.class);
         System.out.println(users);
     }
 
     @Test
     void t2() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.likeRight("user_name", "n");
         ArrayList<User> users1 = baseMapper.selectTargets(User.class, wrapper);
         System.out.println(users1);
@@ -38,7 +37,7 @@ class XWebalbumApplicationTests {
     //order
     @Test
     void t3() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.orderDesc("user_type");
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         System.out.println();
@@ -48,7 +47,7 @@ class XWebalbumApplicationTests {
     //分页
     @Test
     void t4() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.orderDesc("user_type").limit(1, 2);
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         System.out.println();
@@ -57,7 +56,7 @@ class XWebalbumApplicationTests {
 
     @Test
     void t5() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         users.forEach(System.out::println);
     }
@@ -72,7 +71,7 @@ class XWebalbumApplicationTests {
 
     @Test
     void t9() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("user_name", "admin").or().like("id", 2);
 
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
@@ -81,7 +80,7 @@ class XWebalbumApplicationTests {
 
     @Test
     void t10() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.in("user_name", "admin", "wen 1").in("user_type", 2, 3);
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         users.forEach(System.out::println);
@@ -89,7 +88,7 @@ class XWebalbumApplicationTests {
 
     @Test
     void t11() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.less("user_type", 1);
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         users.forEach(System.out::println);
@@ -97,22 +96,25 @@ class XWebalbumApplicationTests {
 
     @Test
     void t12() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         users.forEach(System.out::println);
     }
 
     @Test
     void t13() {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         User user = baseMapper.selectTarget(User.class, wrapper);
         System.out.println(user);
     }
 
     @Test
     void t14() {
-        WhereWrapper wrapper = new WhereWrapper();
-        Integer integer = baseMapper.selectCount(User.class);
+        QueryWrapper wrapper = new QueryWrapper()
+                .notEq("user_name", "admin")
+                .or()
+                .notEq("user_type",2);
+        Integer integer = baseMapper.selectCount(User.class, wrapper);
         System.out.println(integer);
     }
 

@@ -3,22 +3,17 @@ package com.wen.baseorm.annotation;
 import java.lang.annotation.*;
 
 /**
- * 为实体类对象指定数据库表名
+ * 为实体类属性指定数据库主键
  *
  * @author calwen
  * @date 2022/7/9
  */
 
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface TableName {
-    /**
-     * 指明表名
-     * 必需指定
-     */
+public @interface IdField {
 
     String value();
-
 
 }

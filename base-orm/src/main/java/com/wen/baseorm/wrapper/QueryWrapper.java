@@ -12,7 +12,7 @@ import java.util.*;
  * @date 2022/7/9
  */
 
-public class WhereWrapper extends AbstractWrapper implements Wrapper {
+public class QueryWrapper extends AbstractWrapper implements Wrapper {
     private static HashSet<OperatEnum> needWhereSet;
     private String selectSQL;
 
@@ -47,7 +47,6 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
 
         for (Node node : whereList) {
             OperatEnum operating = node.getOperating();
-            System.out.println("operating " + operating);
             String field = node.getField();
             Object value = node.getValue();
 
@@ -67,10 +66,6 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
                     whereSQL.append(" `").append(field).append("` ").append(" = ? ");
                     setList.add(value);
                     break;
-              /*  case "EQS":
-                    whereSQL.append(" `").append(field).append("` ").append("<> ? ");
-                    break;
-               */
                 case IN:
                     whereSQL.append(" `").append(field).append("` ").append(" IN ( ");
                     Object[] inValues = (Object[]) value;
@@ -138,105 +133,106 @@ public class WhereWrapper extends AbstractWrapper implements Wrapper {
             }
 
         }
+        whereSQL.append(";");
         map.put("sql", whereSQL);
         map.put("setSQL", setList);
         return map;
     }
 
 
-    public WhereWrapper or() {
+    public QueryWrapper or() {
         Node node = new Node(OperatEnum.OR, null, null);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper eq(String field, Object value) {
+    public QueryWrapper eq(String field, Object value) {
         Node node = new Node(OperatEnum.EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper in(String field, Object... inValues) {
+    public QueryWrapper in(String field, Object... inValues) {
         Node node = new Node(OperatEnum.IN, field, inValues);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper notEq(String field, Object value) {
+    public QueryWrapper notEq(String field, Object value) {
         Node node = new Node(OperatEnum.NOT_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper greater(String field, Object value) {
+    public QueryWrapper greater(String field, Object value) {
         Node node = new Node(OperatEnum.GREATER, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper less(String field, Object value) {
+    public QueryWrapper less(String field, Object value) {
         Node node = new Node(OperatEnum.LESS, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper gEq(String field, Object value) {
+    public QueryWrapper gEq(String field, Object value) {
         Node node = new Node(OperatEnum.G_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper lEq(String field, Object value) {
+    public QueryWrapper lEq(String field, Object value) {
         Node node = new Node(OperatEnum.L_EQ, field, value);
         super.getWhereList().add(node);
         return this;
     }
 
 
-    public WhereWrapper like(String fields, Object value) {
+    public QueryWrapper like(String fields, Object value) {
         Node node = new Node(OperatEnum.LIKE, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper likeLeft(String fields, Object value) {
+    public QueryWrapper likeLeft(String fields, Object value) {
         Node node = new Node(OperatEnum.LIKE_LEFT, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper likeRight(String fields, Object value) {
+    public QueryWrapper likeRight(String fields, Object value) {
         Node node = new Node(OperatEnum.LIKE_RIGHT, fields, value);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper limit(int offset, int rows) {
+    public QueryWrapper limit(int offset, int rows) {
         Node node = new Node(OperatEnum.LIMIT, offset + "," + rows, null);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper limit(int rows) {
+    public QueryWrapper limit(int rows) {
         Node node = new Node(OperatEnum.LIMIT, String.valueOf(rows), null);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper orderDesc(String fields) {
+    public QueryWrapper orderDesc(String fields) {
         Node node = new Node(OperatEnum.ORDER_DESC, fields, null);
         super.getWhereList().add(node);
         return this;
     }
 
-    public WhereWrapper order(String fields) {
+    public QueryWrapper order(String fields) {
         Node node = new Node(OperatEnum.ORDER, fields, null);
         super.getWhereList().add(node);
         return this;
     }
 
 
-    public WhereWrapper select(String selectSQL) {
+    public QueryWrapper select(String selectSQL) {
         this.selectSQL = selectSQL;
         return this;
     }

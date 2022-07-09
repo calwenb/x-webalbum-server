@@ -6,7 +6,7 @@ import com.wen.dao.UserDao;
 import com.wen.pojo.User;
 import com.wen.util.JDBCUtil;
 import com.wen.wrapper.SetWrapper;
-import com.wen.wrapper.WhereWrapper;
+import com.wen.wrapper.QueryWrapper;
 import org.testng.annotations.Test;
 
 import java.sql.Connection;
@@ -31,7 +31,7 @@ public class Test1 {
 
     @Test
     public void t2() throws Exception {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.add("username", "文1");
         System.out.println(BaseMapper.deleteTarget(conn, User.class, wrapper));
     }
@@ -42,7 +42,7 @@ public class Test1 {
         System.out.println(users);
         System.out.println("\n==================\n");
 
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.add("username", "wen");
 
 
@@ -57,20 +57,20 @@ public class Test1 {
         System.out.println(user);
         System.out.println("==================\n");
 
-        WhereWrapper whereWrapper = new WhereWrapper();
-        whereWrapper.add("username", "文0");
-        whereWrapper.or("username", "long");
-        user = UserDao.selectTarget(conn, User.class, whereWrapper);
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.add("username", "文0");
+        queryWrapper.or("username", "long");
+        user = UserDao.selectTarget(conn, User.class, queryWrapper);
         System.out.println(user);
     }
 
     @Test
     public void t5() throws Exception {
-        WhereWrapper whereWrapper = new WhereWrapper();
-        whereWrapper.add("username", "wen");
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.add("username", "wen");
         SetWrapper setWrapper = new SetWrapper();
         setWrapper.add("password", "6661");
-        System.out.println(UserDao.updateTarget(conn, User.class, setWrapper, whereWrapper));
+        System.out.println(UserDao.updateTarget(conn, User.class, setWrapper, queryWrapper));
     }
 
     @Test

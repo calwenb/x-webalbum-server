@@ -1,9 +1,8 @@
 package com.wen.baseorm.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.wen.baseorm.enums.IdTypeEnum;
+
+import java.lang.annotation.*;
 
 /**
  * 为实体类属性指定数据库字段名
@@ -14,6 +13,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface FieldName {
     String value();
+
+    IdTypeEnum idType() default IdTypeEnum.AUTO;
 }

@@ -1,15 +1,14 @@
 package com.wen.baseorm.mapper.impl;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mysql.cj.util.StringUtils;
 import com.wen.baseorm.annotation.FieldName;
-import com.wen.baseorm.annotation.TableName;
-import com.wen.baseorm.util.CastUtil;
-import com.wen.baseorm.util.FieldUtil;
 import com.wen.baseorm.enums.SelectTypeEnum;
 import com.wen.baseorm.mapper.BaseMapper;
+import com.wen.baseorm.util.CastUtil;
+import com.wen.baseorm.util.FieldUtil;
+import com.wen.baseorm.util.MapperUtil;
+import com.wen.baseorm.wrapper.QueryWrapper;
 import com.wen.baseorm.wrapper.SetWrapper;
-import com.wen.baseorm.wrapper.WhereWrapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,11 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -42,7 +37,7 @@ public class BaseMapperImpl implements BaseMapper {
     Connection conn;
 
 
-    private <T> Object baseSelect(Class<T> targetClass, WhereWrapper wrapper, SelectTypeEnum type) {
+    private <T> Object baseSelect(Class<T> targetClass, QueryWrapper wrapper, SelectTypeEnum type) {
         try {
             conn = dataSource.getConnection();
             ArrayList<T> targets = new ArrayList<>();
@@ -50,10 +45,10 @@ public class BaseMapperImpl implements BaseMapper {
             //反射获取目标信息
             Field[] fields = targetClass.getDeclaredFields();
             //确定表名
-            String tableName = defineTableName(targetClass);
+            String tableName = MapperUtil.parseTableName(targetClass);
 
             //sql拼接
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
 
             sql.append("SELECT ");
 
@@ -93,45 +88,20 @@ public class BaseMapperImpl implements BaseMapper {
             System.out.println(pst);
             ResultSet rs = pst.executeQuery();
 
-            //获取全部属性的类
-            Class<?>[] classes = new Class[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                fields[i].setAccessible(true);
-                classes[i] = fields[i].getType();
-            }
-            //获取类构造器
-            Constructor<T> ClassCon = targetClass.getDeclaredConstructor(classes);
+            //获得类构造器
+            Constructor<T> classCon = MapperUtil.getConstructor(targetClass, fields);
 
             //返回数据解析实体
             while (rs.next()) {
-
+                //count(*)
                 if (Objects.equals(type, SelectTypeEnum.COUNT)) {
                     return rs.getInt(1);
                 }
-
 /*                if (wrapper != null) {
                     if (!StringUtils.isNullOrEmpty(wrapper.getSelectSQL())) {
                     }
                 }*/
-                Object[] fieldsVal = new Object[fields.length];
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    //尝试获取属性上注解
-                    FieldName fieldName = fields[i].getDeclaredAnnotation(FieldName.class);
-                    if (fieldName != null) {
-                        fieldsVal[i] = rs.getObject(String.valueOf(fieldName.value()));
-                    } else {
-                        fieldsVal[i] = rs.getObject(FieldUtil.fieldJavaToSql(fields[i].getName()));
-                    }
-                    //LocalDateTime转Date
-                    if (fieldsVal[i] != null && fieldsVal[i].getClass().equals(LocalDateTime.class)) {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.registerModule(new JavaTimeModule());
-                        fieldsVal[i] = Date.from(objectMapper.convertValue(fieldsVal[i], LocalDateTime.class).atZone(ZoneId.systemDefault()).toInstant());
-                    }
-
-                }
-                T target = ClassCon.newInstance(fieldsVal);
+                T target = MapperUtil.parseTarget(rs, fields, classCon);
                 if (type == SelectTypeEnum.ONE) {
                     return target;
                 }
@@ -158,7 +128,7 @@ public class BaseMapperImpl implements BaseMapper {
     }
 
     @Override
-    public <T> Integer selectCount(Class<T> targetClass, WhereWrapper wrapper) {
+    public <T> Integer selectCount(Class<T> targetClass, QueryWrapper wrapper) {
         return (Integer) baseSelect(targetClass, wrapper, SelectTypeEnum.COUNT);
     }
 
@@ -171,7 +141,7 @@ public class BaseMapperImpl implements BaseMapper {
      * <T> 规定泛型化
      */
     @Override
-    public <T> ArrayList<T> selectTargets(Class<T> targetClass, WhereWrapper wrapper) {
+    public <T> ArrayList<T> selectTargets(Class<T> targetClass, QueryWrapper wrapper) {
         return (ArrayList<T>) baseSelect(targetClass, wrapper, SelectTypeEnum.ALL);
 
     }
@@ -182,7 +152,7 @@ public class BaseMapperImpl implements BaseMapper {
     }
 
 
-    public <T> T selectTarget(Class<T> targetClass, WhereWrapper wrapper) {
+    public <T> T selectTarget(Class<T> targetClass, QueryWrapper wrapper) {
         return (T) baseSelect(targetClass, wrapper, SelectTypeEnum.ONE);
     }
 
@@ -220,36 +190,11 @@ public class BaseMapperImpl implements BaseMapper {
             System.out.println(pst);
             ResultSet rs = pst.executeQuery();
 
-            //获取全部属性的类
-            Class<?>[] classes = new Class[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                fields[i].setAccessible(true);
-                classes[i] = fields[i].getType();
-            }
-            //获取类构造器
-            Constructor<T> ClassCon = targetClass.getDeclaredConstructor(classes);
+            Constructor<T> classCon = MapperUtil.getConstructor(targetClass, fields);
 
             //返回数据解析实体
             while (rs.next()) {
-                Object[] fieldsVal = new Object[fields.length];
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    //尝试获取属性上注解
-                    FieldName fieldName = fields[i].getDeclaredAnnotation(FieldName.class);
-                    if (fieldName != null) {
-                        fieldsVal[i] = rs.getObject(String.valueOf(fieldName.value()));
-                    } else {
-                        fieldsVal[i] = rs.getObject(FieldUtil.fieldJavaToSql(fields[i].getName()));
-                    }
-                    //LocalDateTime转Date
-                    if (fieldsVal[i] != null && fieldsVal[i].getClass().equals(LocalDateTime.class)) {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.registerModule(new JavaTimeModule());
-                        fieldsVal[i] = Date.from(objectMapper.convertValue(fieldsVal[i], LocalDateTime.class).atZone(ZoneId.systemDefault()).toInstant());
-                    }
-
-                }
-                T target = ClassCon.newInstance(fieldsVal);
+                T target = MapperUtil.parseTarget(rs, fields, classCon);
                 targets.add(target);
             }
             return targets;
@@ -283,9 +228,9 @@ public class BaseMapperImpl implements BaseMapper {
             Field[] fields = targetClass.getDeclaredFields();
 
             //确定表名
-            String tableName = defineTableName(targetClass);
+            String tableName = MapperUtil.parseTableName(targetClass);
 
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             sql.append("INSERT INTO ").append(tableName);
             sql.append(" ( ");
             for (int i = 1; i < fields.length; i++) {
@@ -353,9 +298,9 @@ public class BaseMapperImpl implements BaseMapper {
             Field[] fields = targetClass.getDeclaredFields();
 
             //确定表名
-            String tableName = defineTableName(targetClass);
+            String tableName = MapperUtil.parseTableName(targetClass);
 
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             sql.append("REPLACE INTO ").append(tableName);
             sql.append(" VALUES( ");
             //插入值
@@ -393,18 +338,18 @@ public class BaseMapperImpl implements BaseMapper {
         }
     }
 
-    public <T> int deleteTarget(Class<T> targetClass, WhereWrapper whereWrapper) {
+    public <T> int deleteTarget(Class<T> targetClass, QueryWrapper queryWrapper) {
 
         try {
             conn = dataSource.getConnection();
             //删除必须指定条件，否则会全表删除
-            if (whereWrapper == null) {
+            if (queryWrapper == null) {
                 System.out.println("删除必须指定条件，否则会全表删除!!!");
                 return 0;
             }
 
             //条件查询，解析where sql
-            HashMap<String, Object> wrapperResult = whereWrapper.getResult();
+            HashMap<String, Object> wrapperResult = queryWrapper.getResult();
             String whereSQL = String.valueOf(wrapperResult.get("sql"));
             List<Object> setFields = CastUtil.castList(wrapperResult.get("setSQL"), Object.class);
             if ("".equals(whereSQL)) {
@@ -413,9 +358,9 @@ public class BaseMapperImpl implements BaseMapper {
             }
 
 
-            String tableName = defineTableName(targetClass);
+            String tableName = MapperUtil.parseTableName(targetClass);
 
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             sql.append("DELETE FROM ").append(tableName);
             sql.append(whereSQL);
 
@@ -439,17 +384,17 @@ public class BaseMapperImpl implements BaseMapper {
         }
     }
 
-    public <T> int updateTarget(Class<T> targetClass, SetWrapper setWrapper, WhereWrapper whereWrapper) {
+    public <T> int updateTarget(Class<T> targetClass, SetWrapper setWrapper, QueryWrapper queryWrapper) {
 
         try {
             conn = dataSource.getConnection();
             //更新必须指定条件
-            if (setWrapper == null || whereWrapper == null) {
+            if (setWrapper == null || queryWrapper == null) {
                 System.out.println("更新必须指定set,where");
                 return 0;
             }
             //条件查询，解析where sql
-            HashMap<String, Object> wrapperResult = whereWrapper.getResult();
+            HashMap<String, Object> wrapperResult = queryWrapper.getResult();
             String whereSQL = String.valueOf(wrapperResult.get("sql"));
             List<Object> setWhereSQL = CastUtil.castList(wrapperResult.get("setSQL"), Object.class);
 
@@ -463,10 +408,10 @@ public class BaseMapperImpl implements BaseMapper {
                 return 0;
             }
             //确定表名
-            String tableName = defineTableName(targetClass);
+            String tableName = MapperUtil.parseTableName(targetClass);
 
             //拼接sql
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             sql.append("UPDATE ").append(tableName);
             sql.append(setSQL);
             sql.append(whereSQL);
@@ -492,21 +437,6 @@ public class BaseMapperImpl implements BaseMapper {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    private static <T> String defineTableName(Class<T> targetClass) {
-        //反射获取目标信息
-        TableName tableNameAnno = targetClass.getDeclaredAnnotation(TableName.class);
-        String className = targetClass.getSimpleName();
-
-        //确定表名
-        String tableName;
-        if (tableNameAnno != null) {
-            tableName = tableNameAnno.value();
-        } else {
-            tableName = className;
-        }
-        return tableName;
     }
 
 

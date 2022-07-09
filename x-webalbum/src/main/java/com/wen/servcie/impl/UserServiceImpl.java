@@ -6,7 +6,7 @@ import com.wen.pojo.User;
 import com.wen.servcie.*;
 import com.wen.utils.ConfigUtil;
 import com.wen.utils.FileUtil;
-import com.wen.baseorm.wrapper.WhereWrapper;
+import com.wen.baseorm.wrapper.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ArrayList<User> queryUsersTerm(String term, String value) {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.add(term, value);
         ArrayList<User> users = baseMapper.selectTargets(User.class, wrapper);
         return users;
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> queryUsersLike(String term, String key) {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.like(term, key);
         return baseMapper.selectTargets(User.class, wrapper);
     }
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int verifyAdmin(int userId) {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.add("id", userId);
         User user = baseMapper.selectTarget(User.class);
         if (user != null) {
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public int deleteUser(int userId) {
-        WhereWrapper wrapper = new WhereWrapper();
+        QueryWrapper wrapper = new QueryWrapper();
         wrapper.add("id", userId);
         User user = baseMapper.selectTarget(User.class, wrapper);
         if (user != null && user.getUserType() == 0) {
